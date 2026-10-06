@@ -13,28 +13,20 @@ import java.sql.Timestamp;
 public class events extends news {
     private Timestamp eventDate;
     private String Location;
-    public events(String title, String description, String source, String author, Timestamp publishDate, String URL, String publisher,String language, Timestamp eventDate, String Location )
+    public events(String title, String description, String source, String author,
+                Timestamp publishDate,Timestamp creationDate,
+                Timestamp lastModifiedDate, String URL, String publisher, String language, String coverImage,
+                Timestamp eventDate, String Location)
     {
-        super(title, description,source,author,publishDate,URL, publisher, language);
+        super(title, description,source,author,publishDate,creationDate,lastModifiedDate,
+                URL, publisher, language, coverImage);
         this.eventDate=eventDate;
         this.Location=Location;
     }
     //get-ers, set-ers
-    public Timestamp geteventDate()
-    {
-        return eventDate;
-    }
-    public String getLocation()
-    {
-        return Location;
-    }
+    public Timestamp geteventDate(){return eventDate;}
+    public void seteventDate(Timestamp eventDate){this.eventDate=eventDate;}
     
-    public void seteventDate(Timestamp eventDate)
-    {
-        this.eventDate=eventDate;
-    }
-    public void setLocation(String Location)
-    {
-        this.Location=Location;
-    }
+    public String getLocation(){return Location;}
+    public void setLocation(String Location){this.Location=Location;}
 }
