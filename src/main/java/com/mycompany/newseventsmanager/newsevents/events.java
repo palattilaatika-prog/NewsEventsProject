@@ -29,4 +29,9 @@ public class events extends news {
     
     public String getLocation(){return Location;}
     public void setLocation(String Location){this.Location=Location;}
+    @Override
+    public String toString()
+    {
+        return "title: " + gettitle()+" date: "+ geteventDate();
+    }
 }
