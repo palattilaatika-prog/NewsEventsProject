@@ -6,6 +6,8 @@ package com.mycompany.newseventsmanager.DataB;
 
 import com.mycompany.newseventsmanager.newsevents.events;
 import com.mycompany.newseventsmanager.newsevents.news;
+import com.mycompany.newseventsmanager.validation.validation;
+import com.mycompany.newseventsmanager.validation.ValidatorLogic;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +19,11 @@ import java.util.List;
 public class DatabaseManager {
     // --- NEWS CRUD ---
 
-    public static void insertNews(news news) {
+    public static boolean insertNews(news news) {
+        validation val = ValidatorLogic.validateNews(news);
+        if (!val.isValid()) {
+            throw new IllegalArgumentException("Validation failed at insert:\n• " + val.getFormattedErrors());
+        }
         String sql = "INSERT OR IGNORE INTO news(title, description, source, author, publisher, publish_date, url, creation_date, last_modified_date, language, cover_image) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = Database.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, news.gettitle());
@@ -31,16 +37,20 @@ public class DatabaseManager {
             pstmt.setTimestamp(9, news.getlastModifiedDate());
             pstmt.setString(10, news.getlanguage());
             pstmt.setString(11, news.getcoverImage());
-            pstmt.executeUpdate();
+            return pstmt.executeUpdate()>0;
         } catch (SQLException e) {
             System.err.println("Error inserting news: " + e.getMessage());
+            return false;
         }
     }
 
     public static List<news> getAllNews() {
         List<news> list = new ArrayList<>();
         String sql = "SELECT * FROM news ORDER BY publish_date DESC";
-        try (Connection conn = Database.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = Database.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) 
+        {
             while (rs.next()) {
                 news news = new news(
                         rs.getString("title"),
@@ -93,6 +103,10 @@ public class DatabaseManager {
     }
 
     public static void updateNews(news news) {
+        validation val = ValidatorLogic.validateNews(news);
+        if (!val.isValid()) {
+            throw new IllegalArgumentException("Validation failed at update:\n• " + val.getFormattedErrors());
+        }
         String sql = "UPDATE news SET title = ?, description = ?, author = ?, publisher = ?, publish_date = ?, last_modified_date = ?, language = ?, cover_image = ? WHERE source = ? AND url = ?";
         try (Connection conn = Database.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, news.gettitle());
@@ -124,7 +138,11 @@ public class DatabaseManager {
 
     // --- EVENT CRUD ---
 
-    public static void insertEvent(events event) {
+    public static boolean insertEvent(events event) {
+        validation val = ValidatorLogic.validateEvent(event);
+        if (!val.isValid()) {
+            throw new IllegalArgumentException("Validation failed at insert:\n• " + val.getFormattedErrors());
+        }
         String sql = "INSERT OR IGNORE INTO events(title, description, source, author, publisher, publish_date, url, creation_date, last_modified_date, language, cover_image, event_datetime, location) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = Database.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, event.gettitle());
@@ -140,10 +158,12 @@ public class DatabaseManager {
             pstmt.setString(11, event.getcoverImage());
             pstmt.setTimestamp(12, event.geteventDate());
             pstmt.setString(13, event.getLocation());
-            pstmt.executeUpdate();
+            return pstmt.executeUpdate()>0;
         } catch (SQLException e) {
             System.err.println("Error inserting event: " + e.getMessage());
+            return false;
         }
+        
     }
 
     public static List<events> getAllEvents() {
@@ -175,6 +195,10 @@ public class DatabaseManager {
     }
 
     public static void updateEvent(events event, String oldTitle, Timestamp oldDateTime, String oldLocation) {
+        validation val = ValidatorLogic.validateEvent(event);
+        if (!val.isValid()) {
+            throw new IllegalArgumentException("Validation failed:\n• " + val.getFormattedErrors());
+        }
         String sql = "UPDATE events SET title = ?, description = ?, source = ?, author = ?, publisher = ?, publish_date = ?, url = ?, last_modified_date = ?, language = ?, cover_image = ?, event_datetime = ?, location = ? WHERE title = ? AND event_datetime = ? AND location = ?";
         try (Connection conn = Database.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, event.gettitle());
