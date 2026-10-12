@@ -60,8 +60,8 @@ public class DatabaseManager {
                         rs.getTimestamp("publish_date"),
                         rs.getTimestamp("creation_date"),
                         rs.getTimestamp("last_modified_date"),
-                        rs.getString("publisher"),
                         rs.getString("url"),
+                        rs.getString("publisher"),
                         rs.getString("language"),
                         rs.getString("cover_image")
                 );
@@ -85,12 +85,12 @@ public class DatabaseManager {
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("source"),
-                        rs.getString("authoor"),
+                        rs.getString("author"),
                         rs.getTimestamp("publish_date"),
                         rs.getTimestamp("creation_date"),
                         rs.getTimestamp("last_modified_date"),
-                        rs.getString("publisher"),
                         rs.getString("url"),
+                        rs.getString("publisher"),
                         rs.getString("language"),
                         rs.getString("cover_image")
                 );
@@ -179,8 +179,8 @@ public class DatabaseManager {
                         rs.getTimestamp("publish_date"),
                         rs.getTimestamp("creation_date"),
                         rs.getTimestamp("last_modified_date"),
-                        rs.getString("publisher"),
                         rs.getString("url"),
+                        rs.getString("publisher"),
                         rs.getString("language"),
                         rs.getString("cover_image"),
                         rs.getTimestamp("event_datetime"),
@@ -190,6 +190,36 @@ public class DatabaseManager {
             }
         } catch (SQLException e) {
             System.err.println("Error fetching events: " + e.getMessage());
+        }
+        return list;
+    }
+    public static List<events> searchEevents(String keyword) {
+        List<events> list = new ArrayList<>();
+        String sql = "SELECT * FROM events WHERE title LIKE ? OR description LIKE ? ORDER BY publish_date DESC";
+        try (Connection conn = Database.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + keyword + "%");
+            pstmt.setString(2, "%" + keyword + "%");
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                events events = new events(
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("source"),
+                        rs.getString("author"),
+                        rs.getTimestamp("publish_date"),
+                        rs.getTimestamp("creation_date"),
+                        rs.getTimestamp("last_modified_date"),
+                        rs.getString("url"),
+                        rs.getString("publisher"),
+                        rs.getString("language"),
+                        rs.getString("cover_image"),
+                        rs.getTimestamp("event_datetime"),
+                        rs.getString("location")
+                );
+                list.add(events);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error searching events: " + e.getMessage());
         }
         return list;
     }
