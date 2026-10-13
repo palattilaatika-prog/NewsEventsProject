@@ -96,15 +96,16 @@ public class MainWindow extends JFrame {
     }
 
     private void onItemSelected() {
-        Object selected = masterPanel.getSelectedItem();
-        if (selected instanceof news n) {
-            detailPanel.displayNews(n);
-        } else if (selected instanceof events ev) {
-            detailPanel.displayEvent(ev);
-        } else {
-            detailPanel.clear();
-        }
+    Object selected = masterPanel.getSelectedItem();
+    masterPanel.markAsRead(selected);          
+    if (selected instanceof events ev) {    
+        detailPanel.displayEvent(ev);
+    } else if (selected instanceof news n) {
+        detailPanel.displayNews(n);
+    } else {
+        detailPanel.clear();
     }
+}
 
     private void performAsyncRefresh() {
         toolBar.setLoadingState(true);
