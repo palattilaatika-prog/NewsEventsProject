@@ -19,10 +19,16 @@ public class ToolBar extends JToolBar{
     private final JTextField searchField;
     private final JButton refreshButton;
     private final JLabel statusLabel;
+    private final JProgressBar progressBar = new JProgressBar();
 
     public ToolBar(Runnable onSearchChanged, ActionListener onRefreshClicked) {
         setFloatable(false);
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        progressBar.setIndeterminate(true);
+        progressBar.setPreferredSize(new Dimension(100, 16));
+        progressBar.setVisible(false);
+        add(progressBar);
+        
 
         add(new JLabel("Search:"));
         searchField = new JTextField(25);
@@ -51,6 +57,7 @@ public class ToolBar extends JToolBar{
     public void setLoadingState(boolean isLoading) {
         refreshButton.setEnabled(!isLoading);
         searchField.setEnabled(!isLoading);
+        progressBar.setVisible(isLoading);
         statusLabel.setText(isLoading ? " Loading feeds..." : "");
     }
 }

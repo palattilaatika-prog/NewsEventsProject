@@ -8,7 +8,6 @@ import com.mycompany.newseventsmanager.newsevents.events;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 /**
  *
  * @author Denes
