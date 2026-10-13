@@ -101,16 +101,48 @@ public class DetailPanel extends JPanel {
     }
 
     private void loadImage(String imagePath) {
-        String pathToUse = (imagePath != null && !imagePath.trim().isEmpty() && new File(imagePath).exists())
-                ? imagePath : DEFAULT_IMAGE;
+    try {
+        ImageIcon icon;
 
-        if (new File(pathToUse).exists()) {
-            ImageIcon icon = new ImageIcon(pathToUse);
-            Image scaled = icon.getImage().getScaledInstance(220, 140, Image.SCALE_SMOOTH);
-            imageLabel.setIcon(new ImageIcon(scaled));
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            // No image path was provided
+            icon = new ImageIcon(DEFAULT_IMAGE);
+        } else if (imagePath.startsWith("http://")
+                || imagePath.startsWith("https://")) {
+            // Load the image from the internet
+            icon = new ImageIcon(new java.net.URL(imagePath));
         } else {
+            // Load the image from a local file
+            java.io.File file = new java.io.File(imagePath);
+
+            if (file.exists()) {
+                icon = new ImageIcon(file.getAbsolutePath());
+            } else {
+                icon = new ImageIcon(DEFAULT_IMAGE);
+            }
+        }
+
+        // Check whether the image loaded successfully
+        if (icon.getIconWidth() <= 0 || icon.getIconHeight() <= 0) {
             imageLabel.setIcon(null);
             imageLabel.setText("No Image Available");
+            return;
         }
+
+        // Resize the image to fit the panel
+        Image scaled = icon.getImage().getScaledInstance(
+                220, 140, Image.SCALE_SMOOTH
+        );
+
+        imageLabel.setText("");
+        imageLabel.setIcon(new ImageIcon(scaled));
+
+    } catch (Exception e) {
+        imageLabel.setIcon(null);
+        imageLabel.setText("No Image Available");
+
+        System.err.println("Failed to load image: " + imagePath);
+        e.printStackTrace();
     }
+}
 }
